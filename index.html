@@ -94,6 +94,8 @@ button{font:inherit}
 .callout.amber{border-color:var(--amber)}.callout.violet{border-color:var(--violet)}.callout.emerald{border-color:var(--emerald)}
 .hint{font-size:11.5px;color:var(--ink-mute);margin-top:6px;display:flex;gap:6px;align-items:center}
 .hint:before{content:"ⓘ";color:var(--cyan);font-size:12px}
+option{background:#0b1220;color:#f4f7fb}
+[data-theme="light"] option{background:#ffffff;color:#0c1626}
 
 /* ---------- Welcome ---------- */
 .welcome{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 24px;text-align:center;animation:rise .5s ease}
@@ -249,6 +251,11 @@ tbody tr:hover{background:var(--glass-2)}.num{text-align:right;font-variant-nume
 .range3 .r b{display:block;font-size:16px;margin-top:5px}
 .idot{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;font-size:10px;font-weight:800;font-style:italic;background:rgba(56,225,255,.16);color:var(--cyan);cursor:pointer;margin-left:5px;vertical-align:middle;border:1px solid rgba(56,225,255,.35)}
 .idot:hover{background:var(--cyan);color:#05121f}
+.diagq{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--glass-brd)}
+.diagq .q{font-size:13px}
+.seg{display:flex;gap:3px;background:var(--glass);border:1px solid var(--glass-brd);border-radius:10px;padding:3px;flex:0 0 auto}
+.seg button{border:none;background:transparent;color:var(--ink-soft);padding:6px 12px;border-radius:7px;font-size:11.5px;cursor:pointer}
+.seg button.on{background:var(--glass-2);color:var(--ink);box-shadow:var(--shadow)}
 .needs{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--amber);background:rgba(255,194,75,.14);border:1px solid rgba(255,194,75,.35);padding:2px 8px;border-radius:20px;cursor:pointer}
 .vm-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .vm-kpis .k{padding:14px;border-radius:14px;background:var(--glass-2);border:1px solid var(--glass-brd)}
@@ -333,12 +340,12 @@ function recommend(a){const q=a.quadrant;
   return{tag:"Retire",cls:"rose",text:"Low value and low readiness — redesign the use case, improve data, or retire."};}
 
 /* =====================================================================
-   EXAMPLE DATASET — Contoso (synthetic, indicative only)
+   EXAMPLE DATASET — generic corporate services (synthetic, indicative only)
    ===================================================================== */
 function lv(pillar,driver,baseName,baseVal,unit,change,mins,txns,users,rate,conf,atype,src,valreq){return{pillar,driver,baseName,baseVal,unit,change,mins,txns,users,rate,conf,atype,src,valreq};}
 function ag(o){return Object.assign({type:"Assistive agent",platform:"Microsoft Copilot / Copilot Studio",lifecycle:"Piloting",usage:"Growing",risk:"Medium",readiness:60},o);}
 const EXAMPLE={
-  name:"Contoso Corporate Services (Demo)",industry:"Corporate / Enterprise",region:"Australia",currency:"AUD",period:"FY2025–26 (indicative)",annualPlatformCost:1850000,
+  name:"Example Corporate Services (Demo)",industry:"Corporate / Enterprise",region:"Australia",currency:"AUD",period:"FY2025–26 (indicative)",annualPlatformCost:1850000,
   employees:26000,budget:"—",aiMaturity:2,stance:"have",
   statement:"AI agents are lifting employee productivity, improving customer and employee experience, and strengthening compliance — creating capacity for higher-value work across shared services.",
   pillars:["Productivity & Process Efficiency","Customer Experience","Employee Experience","Compliance & Risk","Financial Optimisation"],
@@ -381,6 +388,7 @@ const UNIVERSAL_PILLARS=["Operational Efficiency & Capacity","Service Experience
 const UNIVERSAL_INTERP={"Operational Efficiency & Capacity":"Time and capacity returned across core processes.","Service Experience & Outcomes":"Faster, more consistent service to customers, citizens or patients.","Workforce Sustainability & Capability":"Lower administrative load and faster knowledge access supporting the workforce.","Risk, Governance & Compliance":"More consistent, auditable outputs reducing exposure.","Financial Value & Cost Avoidance":"Reduced rework and avoidable cost."};
 const INDUSTRIES=["Public Safety / Policing","Health & Human Services","Local Government","Justice & Courts","Transport & Infrastructure","Education","Utilities","Finance","Corporate / Enterprise"];
 const IND_RATE={"Public Safety / Policing":78,"Health & Human Services":92,"Local Government":68,"Justice & Courts":82,"Transport & Infrastructure":80,"Education":66,"Utilities":78,"Finance":95,"Corporate / Enterprise":72};
+const REPET=[{k:'judgement',label:'Largely judgement-based',lo:5,hi:12},{k:'mixed',label:'Mixed judgement & routine',lo:10,hi:20},{k:'mostly',label:'Mostly repetitive',lo:18,hi:30},{k:'highly',label:'Highly repetitive / rules-based',lo:28,hi:45}];
 const HELP_CATS=[
   {k:"Summarising information",ic:"📝",pillar:"Operational Efficiency & Capacity",mins:9},
   {k:"Case management",ic:"🗂️",pillar:"Service Experience & Outcomes",mins:10},
@@ -392,6 +400,19 @@ const HELP_CATS=[
 ];
 const USER_GROUPS=["Frontline Staff","Managers","Executives","Customers","Citizens","Clinical Teams","Support Teams"];
 const MATURITY=["Beginner","Developing","Established","Transforming"];
+const _OE="Operational Efficiency & Capacity",_SE="Service Experience & Outcomes",_WF="Workforce Sustainability & Capability",_RG="Risk, Governance & Compliance",_FV="Financial Value & Cost Avoidance";
+const INDCFG={
+ "Public Safety / Policing":{cats:[{k:"Incident & report drafting",ic:"📝",pillar:_OE,mins:10},{k:"Case documentation",ic:"🗂️",pillar:_OE,mins:12},{k:"Briefing & handover summaries",ic:"📋",pillar:_OE,mins:9},{k:"Community enquiry response",ic:"💬",pillar:_SE,mins:7},{k:"Records & information retrieval",ic:"📚",pillar:_WF,mins:6},{k:"Compliance & disclosure checks",ic:"✔️",pillar:_RG,mins:6}],groups:["Frontline officers","Investigators","Supervisors","Admin staff","Executives"],placeholder:"e.g. Incident reporting and case documentation"},
+ "Health & Human Services":{cats:[{k:"Clinical documentation",ic:"🩺",pillar:_OE,mins:10},{k:"Referral preparation",ic:"📨",pillar:_SE,mins:12},{k:"Patient communication drafting",ic:"💬",pillar:_SE,mins:8},{k:"Discharge & summary drafting",ic:"📄",pillar:_OE,mins:14},{k:"Guideline & knowledge retrieval",ic:"📚",pillar:_WF,mins:6},{k:"Coding & compliance support",ic:"✔️",pillar:_RG,mins:9}],groups:["Clinicians","Nursing staff","Allied health","Admin staff","Governance leads"],placeholder:"e.g. Outpatient referral preparation"},
+ "Local Government":{cats:[{k:"Resident enquiry response",ic:"💬",pillar:_SE,mins:7},{k:"Permit & application processing",ic:"📄",pillar:_OE,mins:12},{k:"Document & report drafting",ic:"📝",pillar:_OE,mins:10},{k:"Case & request management",ic:"🗂️",pillar:_SE,mins:9},{k:"Knowledge & policy retrieval",ic:"📚",pillar:_WF,mins:5},{k:"Compliance & records checks",ic:"✔️",pillar:_RG,mins:6}],groups:["Customer service staff","Officers","Planners","Managers","Executives"],placeholder:"e.g. Resident enquiry handling and response"},
+ "Justice & Courts":{cats:[{k:"Case preparation & bundling",ic:"🗂️",pillar:_OE,mins:20},{k:"Document & order drafting",ic:"📄",pillar:_OE,mins:12},{k:"Records & disclosure quality",ic:"✔️",pillar:_RG,mins:8},{k:"Knowledge & precedent retrieval",ic:"📚",pillar:_WF,mins:7},{k:"Enquiry & scheduling response",ic:"💬",pillar:_SE,mins:6}],groups:["Registry staff","Legal staff","Officers","Managers","Executives"],placeholder:"e.g. Court document preparation"},
+ "Transport & Infrastructure":{cats:[{k:"Maintenance & work-order drafting",ic:"🔧",pillar:_OE,mins:10},{k:"Incident & safety reporting",ic:"⚠️",pillar:_RG,mins:9},{k:"Document & compliance review",ic:"✔️",pillar:_RG,mins:12},{k:"Asset & records retrieval",ic:"📚",pillar:_WF,mins:6},{k:"Customer & passenger enquiries",ic:"💬",pillar:_SE,mins:6}],groups:["Field staff","Engineers","Controllers","Admin staff","Executives"],placeholder:"e.g. Maintenance work-order processing"},
+ "Education":{cats:[{k:"Content & lesson drafting",ic:"📝",pillar:_OE,mins:12},{k:"Student & parent enquiry response",ic:"💬",pillar:_SE,mins:7},{k:"Administration & reporting",ic:"📄",pillar:_OE,mins:10},{k:"Knowledge & policy retrieval",ic:"📚",pillar:_WF,mins:5},{k:"Compliance & records checks",ic:"✔️",pillar:_RG,mins:6}],groups:["Teaching staff","Admin staff","Support staff","Leaders","Students served"],placeholder:"e.g. Student enquiry response and administration"},
+ "Utilities":{cats:[{k:"Field & work-order reporting",ic:"🔧",pillar:_OE,mins:10},{k:"Customer enquiry response",ic:"💬",pillar:_SE,mins:6},{k:"Document & compliance review",ic:"✔️",pillar:_RG,mins:12},{k:"Asset & knowledge retrieval",ic:"📚",pillar:_WF,mins:6},{k:"Outage & incident summaries",ic:"⚠️",pillar:_OE,mins:9}],groups:["Field crews","Operations staff","Customer service","Engineers","Executives"],placeholder:"e.g. Field work-order reporting"},
+ "Finance":{cats:[{k:"Reporting & reconciliation",ic:"📊",pillar:_FV,mins:16},{k:"Client enquiry response",ic:"💬",pillar:_SE,mins:6},{k:"Document & contract drafting",ic:"📄",pillar:_OE,mins:14},{k:"Compliance & risk checks",ic:"✔️",pillar:_RG,mins:9},{k:"Knowledge & policy retrieval",ic:"📚",pillar:_WF,mins:5}],groups:["Advisors","Analysts","Operations staff","Compliance staff","Executives"],placeholder:"e.g. Month-end reporting and reconciliation"},
+ "Corporate / Enterprise":{cats:[{k:"Customer service & response drafting",ic:"💬",pillar:_SE,mins:6},{k:"Document drafting",ic:"📄",pillar:_OE,mins:12},{k:"Reporting & analysis",ic:"📊",pillar:_FV,mins:16},{k:"HR & employee query resolution",ic:"👤",pillar:_WF,mins:8},{k:"Knowledge retrieval",ic:"📚",pillar:_WF,mins:5},{k:"Procurement & contract support",ic:"📝",pillar:_OE,mins:14},{k:"Compliance & policy checks",ic:"✔️",pillar:_RG,mins:6}],groups:["Frontline staff","Managers","Executives","Support teams","Customers"],placeholder:"e.g. Customer enquiry handling and response"}
+};
+function cfgFor(ind){return INDCFG[ind]||INDCFG["Corporate / Enterprise"];}
 
 /* =====================================================================
    APP STATE
@@ -537,14 +558,14 @@ function onbStep1(){
   const d=APP.onboard;
   return `<div class="stepno">Your organisation</div><div class="qh">Tell us about your organisation</div>
   <div class="qsub">This sets the context for every value estimate. You can change anything later.</div>
-  <div class="field"><label>Organisation name</label><input type="text" id="o_name" value="${d.name||''}" placeholder="e.g. Northbridge City Council" oninput="APP.onboard.name=this.value"></div>
+  <div class="field"><label>Organisation name</label><input type="text" id="o_name" value="${d.name||''}" placeholder="e.g. Your organisation name" oninput="APP.onboard.name=this.value"></div>
   <div class="two">
     <div class="field"><label>Industry</label><select id="o_ind" onchange="APP.onboard.industry=this.value">${INDUSTRIES.map(i=>`<option ${i===d.industry?'selected':''}>${i}</option>`).join("")}</select></div>
-    <div class="field"><label>Region</label><input type="text" value="${d.region||''}" placeholder="e.g. Queensland, Australia" oninput="APP.onboard.region=this.value"></div>
+    <div class="field"><label>Region</label><input type="text" value="${d.region||''}" placeholder="e.g. State or region" oninput="APP.onboard.region=this.value"></div>
   </div>
   <div class="two">
     <div class="field"><label>Employee count</label><input type="number" value="${d.employees}" oninput="APP.onboard.employees=+this.value||0"></div>
-    <div class="field"><label>Annual budget (optional)</label><input type="text" value="${d.budget||''}" placeholder="e.g. $480M" oninput="APP.onboard.budget=this.value"></div>
+    <div class="field"><label>Annual budget — optional ${infoDot('budget')}</label><input type="text" value="${d.budget||''}" placeholder="e.g. $480M" oninput="APP.onboard.budget=this.value"><div class="hint">Optional. Only used to show value as a share of budget — leave blank if unsure.</div></div>
   </div>
   <div class="field"><label>How mature are you with AI?</label>
     <input type="range" min="0" max="3" step="1" value="${d.maturity}" oninput="APP.onboard.maturity=+this.value;document.getElementById('matlab').textContent=MATURITY[this.value]">
@@ -579,20 +600,43 @@ function onbPick3(k){
   onbNext(3);
 }
 function onbStep4(){
-  const b=APP.baseline||computeBaseline(APP.onboard,APP.onboard.stance);APP.baseline=b;
-  return `<div class="stepno">Your baseline</div><div class="qh">Your AI value baseline</div>
-  <div class="qsub">We analysed what you've told us so far. These are indicative starting points — every number becomes more precise as you add agents and data.</div>
-  <div class="baseline-grid">
-    <div class="bcard" style="animation-delay:.02s"><small>Value potential</small><div class="bv">${b.valueBand}</div><div class="bd">Indicative annual value opportunity from AI agents at your scale.</div></div>
-    <div class="bcard" style="animation-delay:.08s"><small>Organisation readiness</small><div class="bv">${b.orgReadiness}%</div><div class="bd">${b.orgReadiness>=65?'Well positioned to adopt.':'Building the foundations to adopt.'}</div></div>
-    <div class="bcard" style="animation-delay:.14s"><small>Governance readiness</small><div class="bv">${b.govReadiness}%</div><div class="bd">Responsible-AI and oversight maturity.</div></div>
-    <div class="bcard" style="animation-delay:.2s"><small>Digital workforce maturity</small><div class="bv">${b.workforce}%</div><div class="bd">Capacity to sustain agents as a digital workforce.</div></div>
+  const d=APP.onboard; if(!d.diag)d.diag={};
+  const b=computeBaseline(d,d.stance);APP.baseline=b;
+  const Q=[['spon','Executive sponsorship and budget for AI'],['data','Data is reasonably organised and access-controlled'],['sec','Security and responsible-AI controls are in place'],['own','Clear ownership and accountability for AI'],['skill','Staff have AI skills and willingness to adopt'],['meas','You measure benefits and value today']];
+  const seg=(id)=>{const v=d.diag[id]!=null?d.diag[id]:60;const opt=[['No',20],['Partly',60],['Yes',95]];return `<div class="seg">${opt.map(o=>`<button class="${v===o[1]?'on':''}" onclick="diagSet('${id}',${o[1]})">${o[0]}</button>`).join('')}</div>`;};
+  return `<div class="stepno">Your baseline</div><div class="qh">Your readiness and opportunity ${infoDot('baseline')}</div>
+  <div class="qsub">We do not guess a value number here — that would not be defensible. Value is quantified bottom-up when you assess each agent. What we can give you now is an honest <b>readiness read</b> from your answers, and an optional <b>opportunity size</b> from a few of your own figures.</div>
+  <div class="card pad"><div class="eyebrow">Readiness diagnostic</div>
+    <div class="hint" style="margin:8px 0 6px">Answer six quick questions — the scores below are the average of your answers, not an assumption.</div>
+    ${Q.map(q=>`<div class="diagq"><div class="q">${q[1]}</div>${seg(q[0])}</div>`).join('')}
+    <div class="baseline-grid" style="margin-top:16px">
+      <div class="bcard"><small>Organisation readiness</small><div class="bv">${b.orgReadiness}%</div><div class="bd">Sponsorship and data foundations.</div></div>
+      <div class="bcard"><small>Governance readiness</small><div class="bv">${b.govReadiness}%</div><div class="bd">Security, responsible-AI and ownership.</div></div>
+      <div class="bcard"><small>Digital workforce maturity</small><div class="bv">${b.workforce}%</div><div class="bd">Skills, adoption and measurement.</div></div>
+    </div>
   </div>
-  <div class="section-h"><h2 class="h2">Agent opportunity areas</h2><span class="note">Where value most commonly starts in ${APP.onboard.industry}</span></div>
-  <div class="checks">${b.opportunities.map(o=>`<span class="check sel" style="cursor:default">${o}</span>`).join("")}</div>
-  <div class="callout amber" style="margin-top:18px">We're using conservative assumptions (40% realisation × 70% prudence). Your data remains editable at every step.</div>
+  <div class="card pad" style="margin-top:16px"><div class="eyebrow">Opportunity size — optional, bottom-up ${infoDot('oppsize')}</div>
+    <div class="hint" style="margin:8px 0 12px">Enter a few of your own figures and we show a deliberately conservative range with the formula. Leave blank and we show no number — we will not guess.</div>
+    <div class="two">
+      <div class="field"><label>Eligible users an agent could support</label><input type="number" value="${d.eligUsers||''}" placeholder="e.g. 800" oninput="APP.onboard.eligUsers=+this.value||0;oppRecalc()"></div>
+      <div class="field"><label>Hours/week per user on repetitive admin</label><input type="number" value="${d.hrsWeek||5}" oninput="APP.onboard.hrsWeek=+this.value||0;oppRecalc()"></div>
+    </div>
+    <div class="field"><label>How repetitive is this work? ${infoDot('repet')}</label>
+      <div class="checks">${REPET.map(r=>`<span class="check ${(d.repetitive||'mostly')===r.k?'sel':''}" onclick="repSet('${r.k}')">${r.label} (${r.lo}–${r.hi}%)</span>`).join('')}</div>
+      <div class="hint">Higher repetitiveness means an agent can safely reduce more of the time — this sets the reduction band.</div></div>
+    <div class="field"><div class="slabel"><span>Target adoption</span><b id="adLab">${d.targetAdopt||60}%</b></div><input type="range" min="10" max="100" step="5" value="${d.targetAdopt||60}" oninput="APP.onboard.targetAdopt=+this.value;document.getElementById('adLab').textContent=this.value+'%';oppRecalc()"></div>
+    <div id="oppOut">${oppOutHTML(d)}</div>
+  </div>
+  <div class="section-h"><h2 class="h2">Where value commonly starts</h2><span class="note">Typical starting points in ${d.industry} — not a forecast</span></div>
+  <div class="checks">${b.opportunities.map(o=>`<span class="check sel" style="cursor:default">${o}</span>`).join('')}</div>
+  <div class="callout amber" style="margin-top:18px">Readiness reflects your answers; any value shown is a conservative range from figures you entered. Real, defensible value comes from assessing individual agents with your data.</div>
   <div class="wizard-nav"><button class="btn ghost" onclick="onbBack(4)">← Back</button><button class="btn primary lg" onclick="onbNext(4)">Continue →</button></div>`;
 }
+function oppOutHTML(d){const opp=sizeOpportunity(d);if(!opp)return `<span class="needs" onclick="hintModal('oppsize')">⚠ add eligible users to size the opportunity</span>`;
+  return `<div class="callout" style="margin-top:4px"><b style="font-size:19px">${opp.band}</b> indicative annual value opportunity<div class="tiny" style="margin-top:6px;font-family:Consolas,monospace">${num(d.eligUsers)} users × ${d.hrsWeek||5} hrs/wk × 44 wks × ${opp.repLo}–${opp.repHi}% reduction × ${Math.round(d.targetAdopt||60)}% adoption × $${opp.rate}/hr × 0.7 conservatism</div></div>`;}
+function oppRecalc(){const e=document.getElementById('oppOut');if(e)e.innerHTML=oppOutHTML(APP.onboard);}
+function diagSet(id,score){if(!APP.onboard.diag)APP.onboard.diag={};APP.onboard.diag[id]=score;render();}
+function repSet(k){APP.onboard.repetitive=k;render();}
 function onbStep5(){
   const d=APP.onboard;
   return `<div class="stepno">Almost there</div><div class="qh">Create your workspace</div>
@@ -618,16 +662,15 @@ function onbNext(step){
   render();
 }
 function onbBack(step){APP.onboardStep=Math.max(1,step-1);render();}
+function sizeOpportunity(o){const u=+o.eligUsers||0;if(!u)return null;const hw=+o.hrsWeek||5;const ad=(+o.targetAdopt||60)/100;const rate=IND_RATE[o.industry]||72;const rawH=u*hw*44;const rep=REPET.find(r=>r.k===(o.repetitive||"mostly"))||REPET[2];const lo=rawH*(rep.lo/100)*ad*rate*0.7,hi=rawH*(rep.hi/100)*ad*rate*0.7;return {band:money(lo)+"–"+money(hi),mid:(lo+hi)/2,lo,hi,rate,rawH,repLo:rep.lo,repHi:rep.hi};}
 function computeBaseline(o,stance){
-  const m=o.maturity||0, emp=o.employees||1000;
-  const potentialFTE=emp*0.02*(0.55+m*0.13);
-  const val=potentialFTE*120000;
-  const band=money(val*0.7)+"–"+money(val*1.15);
-  const st=stance==="have"?10:stance==="planning"?5:0;
-  const clamp=x=>Math.max(20,Math.min(96,Math.round(x)));
+  const d=o.diag||{};const g=(k)=>d[k]!=null?d[k]:60;
+  const clamp=x=>Math.max(20,Math.min(98,Math.round(x)));
   const opps={"Public Safety / Policing":["Documentation","Case summarisation","Enquiry response","Knowledge retrieval"],"Health & Human Services":["Clinical documentation","Referral preparation","Patient communication","Knowledge retrieval"],"Local Government":["Resident enquiries","Approvals & planning","Document drafting","Knowledge retrieval"],"Justice & Courts":["Case preparation","Documentation","Records quality","Knowledge retrieval"],"Transport & Infrastructure":["Maintenance planning","Document review","Incident response","Compliance"],"Education":["Content drafting","Enquiry response","Administration","Knowledge retrieval"],"Utilities":["Field reporting","Document review","Customer enquiries","Compliance"],"Finance":["Reporting","Reconciliation","Customer service","Compliance"],"Corporate / Enterprise":["Customer service","HR & employee queries","Reporting","Document drafting"]}[o.industry]||["Document drafting","Customer enquiries","Reporting","Knowledge retrieval"];
-  return {valueBand:band,orgReadiness:clamp(42+m*15+st),govReadiness:clamp(45+m*12),workforce:clamp(38+m*14+st),opportunities:opps};
+  const opp=sizeOpportunity(o);
+  return {orgReadiness:clamp((g('spon')+g('data'))/2),govReadiness:clamp((g('sec')+g('own'))/2),workforce:clamp((g('skill')+g('meas'))/2),opportunities:opps,valueBand:opp?opp.band:null,valueMid:opp?opp.mid:null,hasValue:!!opp};
 }
+function parseBudget(str){if(!str)return 0;const m=(''+str).replace(/,/g,'');const n=parseFloat(m.replace(/[^0-9.]/g,''));if(!n)return 0;if(/b/i.test(m))return n*1e9;if(/m/i.test(m))return n*1e6;if(/k/i.test(m))return n*1e3;return n;}
 function createWorkspace(){
   const d=APP.onboard;
   APP.org={name:d.name||"Untitled organisation",industry:d.industry,region:d.region,currency:"AUD",employees:d.employees,budget:d.budget,maturity:d.maturity,stance:d.stance,
@@ -834,11 +877,11 @@ function renderCreateAgent(){
   if(w.step===1)body=`<div class="qh">What is your agent called?</div><div class="qsub">Give it a clear, human name your team will recognise.</div>
     <div class="field"><input type="text" value="${w.name||''}" placeholder="e.g. Case Summarisation Agent" oninput="APP.wizard.name=this.value;var b=document.getElementById('wizNext');if(b)b.disabled=!this.value.trim()" autofocus></div>
     <div class="hint">This can be changed later.</div>`;
-  else if(w.step===2)body=`<div class="qh">What does this agent help with?</div><div class="qsub">Pick the closest match — it shapes how we estimate value.</div>
-    <div class="tiles">${HELP_CATS.map(c=>`<div class="tile ${w.cat===c.k?'sel':''}" onclick="APP.wizard.cat='${c.k}';render()"><span class="ic">${c.ic}</span><b>${c.k}</b></div>`).join("")}</div>`;
-  else if(w.step===3)body=`<div class="qh">Who uses this agent?</div><div class="qsub">Select all that apply.</div>
-    <div class="checks">${USER_GROUPS.map(g=>`<span class="check ${w.groups.includes(g)?'sel':''}" onclick="toggleGroup('${g}')">${g}</span>`).join("")}</div>
-    <div class="hint">This helps frame the value story for the right audience.</div>`;
+  else if(w.step===2){const cats=cfgFor(APP.org.industry).cats;body=`<div class="qh">What does this agent help with?</div><div class="qsub">Options are tailored to ${APP.org.industry}. Pick the closest match — it shapes how we estimate value.</div>
+    <div class="tiles">${cats.map((c,i)=>`<div class="tile ${w.cat===c.k?'sel':''}" onclick="pickCat(${i})"><span class="ic">${c.ic}</span><b>${c.k}</b></div>`).join("")}</div>`;}
+  else if(w.step===3){const groups=cfgFor(APP.org.industry).groups;body=`<div class="qh">Who uses this agent?</div><div class="qsub">User groups for ${APP.org.industry}. Select all that apply.</div>
+    <div class="checks">${groups.map((g,i)=>`<span class="check ${w.groups.includes(g)?'sel':''}" onclick="toggleGroup(${i})">${g}</span>`).join("")}</div>
+    <div class="hint">This helps frame the value story for the right audience.</div>`;}
   else if(w.step===4)body=`<div class="qh">How many people use it?</div><div class="qsub">A rough number is fine — you can refine later.</div>
     <div class="field"><div class="slabel"><span>Users</span><b id="uLab">${num(w.users)}</b></div><input type="range" min="10" max="10000" step="10" value="${w.users}" oninput="APP.wizard.users=+this.value;document.getElementById('uLab').textContent=(+this.value).toLocaleString('en-AU')"></div>
     <div class="hint">We use conservative assumptions from here.</div>`;
@@ -846,7 +889,7 @@ function renderCreateAgent(){
     <div class="field"><div class="slabel"><span>Interactions / user / day</span><b id="fLab">${w.freq}</b></div><input type="range" min="1" max="20" step="1" value="${w.freq}" oninput="APP.wizard.freq=+this.value;document.getElementById('fLab').textContent=this.value"></div>
     <div class="hint">≈ ${num((w.users)*(w.freq)*220)} interactions per year at 220 working days.</div>`;
   else if(w.step===6)body=`<div class="qh">Which business process does it support?</div><div class="qsub">One line is enough.</div>
-    <div class="field"><textarea placeholder="e.g. Domestic & family violence documentation and referral" oninput="APP.wizard.process=this.value">${w.process||''}</textarea></div>`;
+    <div class="field"><textarea placeholder="${cfgFor(APP.org.industry).placeholder}" oninput="APP.wizard.process=this.value">${w.process||''}</textarea></div>`;
   else body=`<div class="qh">Ready to generate the assessment</div><div class="qsub">We'll estimate capacity and value from what you've told us.</div>
     <div class="card pad"><div class="kv">
       <div class="k">Agent</div><div><b>${w.name||'Untitled agent'}</b></div>
@@ -867,7 +910,8 @@ function renderCreateAgent(){
     </div>
   </div>`;
 }
-function toggleGroup(g){const i=APP.wizard.groups.indexOf(g);if(i>=0)APP.wizard.groups.splice(i,1);else APP.wizard.groups.push(g);render();}
+function pickCat(i){APP.wizard.cat=cfgFor(APP.org.industry).cats[i].k;render();}
+function toggleGroup(i){const g=cfgFor(APP.org.industry).groups[i];const j=APP.wizard.groups.indexOf(g);if(j>=0)APP.wizard.groups.splice(j,1);else APP.wizard.groups.push(g);render();}
 function agentNext(){const w=APP.wizard;if(w.step===1&&!w.name)return;if(w.step===2&&!w.cat)return;w.step++;render();}
 function agentBack(){APP.wizard.step--;render();}
 function agentGenerate(){APP.wizard.step="gen";render();
@@ -890,7 +934,7 @@ function insightScreen(){
   </div>`;
 }
 function commitAgent(){
-  const w=APP.wizard;const cat=HELP_CATS.find(c=>c.k===w.cat)||HELP_CATS[0];
+  const w=APP.wizard;const cat=cfgFor(APP.org.industry).cats.find(c=>c.k===w.cat)||cfgFor(APP.org.industry).cats[0];
   const txns=Math.round(w.users*w.freq*220);
   const rate=IND_RATE[APP.org.industry]||72;
   const m=APP.org.maturity||1;
@@ -961,6 +1005,15 @@ function renderReports(){
   <div class="soft" style="font-size:13px;margin-top:6px">One click. Choose your audience — the framing adapts.</div>
   <div class="aud no-print">${AUDIENCES.map(a=>`<div class="a ${a===aud?'on':''}" onclick="APP.audience='${a}';render()">${a}</div>`).join("")}</div>
   <div class="no-print" style="margin-bottom:16px"><button class="btn primary" onclick="window.print()">◱ Print / Save as PDF</button> <button class="btn ghost" onclick="copy(execNarrative(O(),APP.audience).replace(/<[^>]+>/g,''))">⧉ Copy narrative</button> <button class="btn ghost" onclick="exportBackup()">⬇ Back up workspace</button> <button class="btn ghost" onclick="exportJSON()">⇩ Export report data</button></div>
+  <div class="card pad no-print" style="margin-bottom:16px"><div class="eyebrow">Executive exports — business value assessment</div>
+    <div class="hint" style="margin:8px 0 12px">Generated live from the four-pillar model with conservative value, executive metrics and the standard final statement.</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="expTalking()">⧉ Executive talking points</button>
+      <button class="btn" onclick="expPPT()">▦ PowerPoint summary</button>
+      <button class="btn" onclick="expExcelSpec()">⇩ Excel dashboard spec</button>
+      <button class="btn" onclick="expPortfolio()">⇩ Portfolio comparison (CSV)</button>
+    </div>
+  </div>
   <div class="report-page">
     <div class="report-cover"><div class="eyebrow">${aud} · AI Agent Value</div><div class="big">${money(t.finalFin)}</div>
       <div class="soft" style="font-size:14px;margin-top:8px">indicative annual value · ${num(t.conservative)} hours returned · ${num1(t.fte)} FTE capacity created</div>
@@ -1124,7 +1177,11 @@ const HINTS={
  capacitygap:{t:'Capacity gap addressed',c:'The FTE-equivalent of digital labour created.',w:'53% of leaders say productivity must rise while 80% of workers lack the time or energy. Agents are digital labour that closes this capacity gap without adding headcount.'},
  phase:{t:'Frontier Firm phase',c:'Phase 1 Assistant, Phase 2 Digital colleague, Phase 3 Autonomous process.',w:'Maps your maturity to the Frontier Firm journey, so leaders see where they are and what the next step looks like.'},
  datasource:{t:'Where the evidence comes from',c:'Connect Copilot Analytics and the Copilot Business Impact Report.',w:'Moves confidence from assumed to measured by grounding value in real adoption, agent usage and your own KPIs (including SAP, Salesforce and Workday).'},
- qualitative:{t:'Qualitative signals',c:'Manager stories, thumbs up/down, CSAT, employee sentiment.',w:'Numbers miss what people experience. Microsoft pairs every value driver with qualitative signals to explain and validate the quantitative story.'}
+ qualitative:{t:'Qualitative signals',c:'Manager stories, thumbs up/down, CSAT, employee sentiment.',w:'Numbers miss what people experience. Microsoft pairs every value driver with qualitative signals to explain and validate the quantitative story.'},
+ baseline:{t:'How this baseline works',c:'Readiness comes from your six answers; any value figure comes only from figures you enter below.',w:'We deliberately do not project a dollar value from headcount alone — that would be a guess. Readiness is the average of your own answers, and the opportunity size is a bottom-up range from inputs you control. Precise value comes later, per agent, from transactions times time-saved times rate with conservative factors.'},
+ oppsize:{t:'How the opportunity size is calculated',c:'Enter eligible users, hours per week on repetitive admin, and target adoption.',w:'This is a bottom-up estimate from your own figures — not a guess from headcount. It applies a conservative 15 to 30 percent reduction band, your adoption rate, an industry labour rate and a 0.7 prudence factor, and shows the formula. No number appears until you provide inputs.'},
+ repet:{t:'How repetitive is this work?',c:'Pick the level that best describes the work the agent supports.',w:'The share of time an agent can realistically reduce depends on how repetitive and rules-based the work is. Highly repetitive tasks free more time; judgement-heavy work frees less. This replaces a fixed assumption with a characteristic you choose, so the range is defensible.'},
+ budget:{t:'Annual budget (optional)',c:'Your annual operating budget, if you want to provide it.',w:'Optional context only. When provided, it lets the tool express the value opportunity as a share of your budget — a familiar reference point for finance. It is never required and does not change any agent calculation.'}
 };
 function infoDot(k){return `<span class="idot" title="Why it matters" onclick="event.stopPropagation();hintModal('${k}')">i</span>`;}
 function hintModal(k){const h=HINTS[k];if(!h)return;showModal(`<h3>${h.t}</h3>${h.c?`<div class="tiny" style="text-transform:uppercase;letter-spacing:.6px;margin:12px 0 4px">What to complete</div><div class="soft" style="font-size:13px">${h.c}</div>`:''}<div class="tiny" style="text-transform:uppercase;letter-spacing:.6px;margin:14px 0 4px;color:var(--cyan)">Why it matters</div><div class="soft" style="font-size:13.5px;line-height:1.6">${h.w}</div>`);}
@@ -1148,6 +1205,71 @@ function vmSection(o){const vm=o.valueModel,t=o.totals;
      ${['Measured','Piloted','Estimated'].map(st=>{const v=vm.byStage[st]||0,pc=t.finalFin?v/t.finalFin*100:0;const col=st==='Measured'?'var(--emerald)':st==='Piloted'?'var(--cyan)':'var(--amber)';return `<div style="margin:10px 0 0"><div style="display:flex;justify-content:space-between"><b style="font-size:12.5px">${st}</b><span class="soft">${money(v)} · ${pct(pc)}</span></div><div class="pbar"><i style="width:${Math.max(2,pc)}%;background:${col}"></i></div></div>`;}).join('')}
    </div>
  </div>`;}
+const FINAL_STATEMENT='These are indicative value estimates and should be refined by the user to ensure assumptions and data are reasonable and aligned to the scope, objectives and operational context of the assessed capability.';
+function slug(x){return (''+x).replace(/\W+/g,'-').replace(/^-|-$/g,'').toLowerCase()||'org';}
+function totalTxns(o){return o.agents.reduce((s,a)=>s+a.levers.reduce((x,l)=>x+((l.vd||'Efficiency')==='Efficiency'?(l.txns||0):0),0),0);}
+function recLines(o){const r=[];const sc=o.agents.filter(a=>a.quadrant==='Scale now').map(a=>a.name);const va=o.agents.filter(a=>a.quadrant==='Validate next').map(a=>a.name);const lo=o.agents.filter(a=>a.conf==='Low').map(a=>a.name);
+  if(sc.length)r.push('Scale to production: '+sc.slice(0,3).join(', ')+'.');
+  if(va.length)r.push('Validate assumptions before scaling: '+va.slice(0,2).join(', ')+'.');
+  if(lo.length)r.push('Improve data and confidence for: '+lo.slice(0,2).join(', ')+'.');
+  r.push('Stand up benefit tracking so estimated value converts to measured value.');return r;}
+function expTalking(){const o=O(),t=o.totals,vm=o.valueModel,tx=totalTxns(o);const vpu=t.users?t.finalFin/t.users:0,vpt=tx?t.finalFin/tx:0;const L=[];
+  L.push('EXECUTIVE TALKING POINTS — '+o.name);
+  L.push('('+o.industry+' · '+o.period+' · '+o.confLabel+' confidence · synthetic/indicative)');L.push('');
+  L.push('HEADLINE');
+  L.push('- '+money(t.finalFin)+' indicative annual value; '+num(t.conservative)+' hours returned ('+num1(t.fte)+' FTE of capacity created).');
+  if(vm.costSet)L.push('- Net ROI '+Math.round(vm.roi)+'% with payback in '+(Math.round(vm.paybackMonths*10)/10)+' months, after '+money(vm.totalCost)+' cost.');
+  L.push('- '+t.agents+' capabilities assessed across '+t.processes+' business processes; '+num(t.users)+' users supported.');L.push('');
+  L.push('VALUE BY STRATEGIC PILLAR');
+  o.pillars.forEach(pl=>L.push('- '+pl.name+': '+money(pl.value)+' ('+pct(pl.pct)+'), '+num(pl.hours)+' hrs returned. '+(pl.interp||'')));L.push('');
+  L.push('TOP VALUE DRIVERS');
+  o.drivers.slice(0,5).forEach((d,i)=>L.push((i+1)+'. '+d.driver+' — '+d.agent+' ('+money(d.finalFin)+', '+d.conf+' confidence)'));L.push('');
+  L.push('EXECUTIVE METRICS');
+  L.push('- Value per user: '+money(vpu)+'   Value per transaction: '+(tx?money(vpt):'n/a')+'   Human-agent ratio: 1 : '+num(vm.usersPerAgent));
+  L.push('- Value measured (not estimated): '+Math.round(vm.measuredPct)+'%   Frontier Firm phase: '+vm.phase.n+' ('+vm.phase.t+')');L.push('');
+  L.push('NARRATIVE');L.push(execNarrative(o,APP.audience).replace(/<[^>]+>/g,''));L.push('');
+  L.push('RECOMMENDATION');recLines(o).forEach(r=>L.push('- '+r));L.push('');
+  L.push(FINAL_STATEMENT);
+  copy(L.join('\n'));}
+function expPPT(){const o=O(),t=o.totals,vm=o.valueModel;const L=[];
+  L.push('# '+o.name+' — AI Agent Value (single executive slide)');L.push('');
+  L.push('## Headline');L.push(money(t.finalFin)+' indicative annual value  ·  '+num(t.conservative)+' hours returned  ·  '+num1(t.fte)+' FTE capacity created');L.push('');
+  L.push('## Key metrics');
+  L.push('- Hours returned: '+num(t.conservative));L.push('- Working days returned: '+num(t.opsDays));L.push('- Equivalent FTE capacity: '+num1(t.fte));L.push('- Annual value: '+money(t.finalFin));
+  if(vm.costSet)L.push('- Net ROI: '+Math.round(vm.roi)+'% (payback '+(Math.round(vm.paybackMonths*10)/10)+' months)');
+  L.push('- Confidence: '+o.confLabel);L.push('');
+  L.push('## Strategic impact');o.pillars.slice(0,4).forEach(pl=>L.push('- '+pl.name+': '+money(pl.value)+' ('+pct(pl.pct)+')'));L.push('');
+  L.push('## Top value drivers');o.drivers.slice(0,5).forEach((d,i)=>L.push((i+1)+'. '+d.driver+' — '+money(d.finalFin)));L.push('');
+  L.push('## Recommendation');recLines(o).forEach(r=>L.push('- '+r));L.push('');
+  L.push('> '+FINAL_STATEMENT);
+  download('executive-summary-'+slug(o.name)+'.md',L.join('\n'),'text/markdown');}
+function expPortfolio(){const o=O();const h=['Capability','Owner','Department','Function','Users','Hours Returned','FTE Created','Annual Value','Net Value','Confidence','Priority','Lead Strategic Pillar'];
+  const rows=[h.join(',')];o.agents.forEach(a=>{const lead=(a.levers[0]&&a.levers[0].pillar)||'';rows.push([a.name,a.owner||'',a.dept||'',a.fn||'',a.users,Math.round(a.conservative),Math.round(a.fte*10)/10,Math.round(a.finalFin),Math.round(a.allocNet!=null?a.allocNet:a.finalFin),a.conf,a.recommendation.tag,lead].map(v=>{v=(''+v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(','));});
+  download('portfolio-comparison-'+slug(o.name)+'.csv',rows.join('\n'),'text/csv');}
+function expExcelSpec(){const o=O(),a=APP.assumptions,vm=o.valueModel;const L=[];
+  L.push('EXCEL DASHBOARD SPECIFICATION — '+o.name);L.push('('+o.industry+' · synthetic/indicative). Colour coding: blue = input, black = formula, green = cross-sheet link.');L.push('');
+  L.push('SHEET 1 · Executive Dashboard');
+  L.push('  KPI cards: Total Hours Returned, Working Days Returned, Equivalent FTE Capacity, Annual Value, Net ROI, Confidence Level.');
+  L.push('  Charts: (1) Hours Returned by Pillar [bar], (2) Value by Pillar [bar/donut], (3) Top Value Drivers [bar], (4) Capacity Created [column], (5) Value Trend [line], (6) Portfolio Comparison [scatter: readiness x value, size=users].');
+  L.push('  Executive insights text box + confidence indicator (Green/Amber/Red).');L.push('');
+  L.push('SHEET 2 · Value Assessment  — one row per capability with hours, FTE, value, confidence, priority.');
+  L.push('SHEET 3 · Strategic Pillars  — per pillar: Value, % contribution, Hours returned, Strategic commentary (SUMIFS roll-up).');
+  L.push('SHEET 4 · Value Drivers      — one row per lever: driver, capability, pillar, value driver type, hours, value, confidence, source.');
+  L.push('SHEET 5 · Assumptions        — Working hours/day='+a.workingHoursPerDay+', Annual hours/FTE='+a.annualHoursPerFTE+', Realisation='+a.realisation+', Conservatism='+a.conservatism+', labour rates, adoption, platform cost.');
+  L.push('SHEET 6 · Calculations       — formulas:');
+  L.push('     HoursSaved   = Transactions*Minutes/60');
+  L.push('     Conservative = HoursSaved*Realisation*Conservatism*Adoption');
+  L.push('     OpsDays      = Conservative/WorkingHoursPerDay');
+  L.push('     FTE          = Conservative/AnnualHoursPerFTE');
+  L.push('     FinalValue   = HoursSaved*LabourRate*Realisation*Conservatism*Adoption');
+  L.push('     QualityValue = (ErrBefore-ErrAfter)*Volume*CostPerError*Conservatism');
+  L.push('     RevenueValue = ConvDelta*Volume*UnitRevenue*Attribution*Conservatism');
+  L.push('     NetROI       = (TotalValue-TotalCost)/TotalCost ;  Payback = TotalCost/TotalValue*12');
+  L.push('SHEET 7 · Data Inputs        — Organisation, Industry, Department, Capability, Users, Transactions, Labour rates, Working days, Working hours, Improvement %, Utilisation/Adoption %, Risk reduction %, Conservatism %, Sources.');
+  L.push('SHEET 8 · Portfolio Benchmarking — Capability, Owner, Department, Hours Returned, FTE Created, Value, Confidence, Priority ranking, Strategic pillar.');L.push('');
+  L.push('Current model snapshot: value '+money(o.totals.finalFin)+', hours '+num(o.totals.conservative)+', FTE '+num1(o.totals.fte)+(vm.costSet?(', Net ROI '+Math.round(vm.roi)+'%'):'')+'.');L.push('');
+  L.push(FINAL_STATEMENT);
+  download('excel-dashboard-spec-'+slug(o.name)+'.txt',L.join('\n'),'text/plain');}
 function resetWorkspace(){showModal(`<h3>Reset workspace?</h3><p class="soft" style="font-size:13px">This clears your organisation and all agents in this prototype and returns you to the welcome screen.</p><div style="margin-top:16px;display:flex;gap:10px"><button class="btn" style="border-color:var(--rose);color:var(--rose)" onclick="doReset()">Yes, reset</button><button class="btn ghost" onclick="closeModal()">Cancel</button></div>`);}
 function doReset(){APP.org=null;APP.agents=[];APP.baseline=null;APP.route="welcome";APP.onboard={name:"",industry:"Corporate / Enterprise",region:"",employees:5000,budget:"",maturity:1,stance:""};closeModal();render();}
 
